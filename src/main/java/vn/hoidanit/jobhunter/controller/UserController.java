@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/user")
+    @PostMapping("/users")
     public User createNewUser(@RequestBody User cretaeUser) {
         // User user = new User();
         // user.setName("lengochai");
@@ -33,7 +33,7 @@ public class UserController {
         return newUser;
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/users/{id}")
 
     public String deleteUser(@PathVariable("id") Long id) {
 
@@ -41,20 +41,20 @@ public class UserController {
         return "delete thanh cong";
     }
 
-    @GetMapping("/user")
+    @GetMapping("/users")
     public List<User> getAllUsers() {
         List<User> users = this.userService.handleGetAllUsers();
         return users;
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public Optional<User> frecUserById(@PathVariable("id") long id) {
         Optional<User> user = this.userService.handleGetAllIdUser(id);
 
         return user;
     }
 
-    @PutMapping("/user/{id}")
+    @PutMapping("/users/{id}")
     public Optional<User> handleUpdateUser(@RequestBody User reqUser, @PathVariable("id") Long id) {
         Optional<User> optionalUser = this.userService.handleUpdateUser(id);
         if (optionalUser.isPresent()) {
