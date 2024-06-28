@@ -8,4 +8,6 @@ import vn.hoidanit.jobhunter.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User save(User user);
+
+    public void deleteById(Long id);
 }
