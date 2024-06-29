@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.service.UserService;
+import vn.hoidanit.jobhunter.service.error.IdInvaidException;
 
 @RestController
 public class UserController {
@@ -40,8 +41,11 @@ public class UserController {
 
     @DeleteMapping("/users/{id}")
 
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) throws IdInvaidException {
+        if (id >= 1001) {
+            throw new IdInvaidException("id ko lơn hơn 1002");
 
+        }
         this.userService.handleDeleteUser(id);
 
         // XÓA LÀ OCEE NHA BAN
