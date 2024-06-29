@@ -3,6 +3,8 @@ package vn.hoidanit.jobhunter.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,39 +25,44 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public User createNewUser(@RequestBody User cretaeUser) {
+    public ResponseEntity<User> createNewUser(@RequestBody User createUser) {
         // User user = new User();
         // user.setName("lengochai");
         // user.setEmail("lengochai@gmail.com");
         // user.setPassword("123456");
 
-        User newUser = this.userService.handleCreateUser(cretaeUser);
-        return newUser;
+        User newUser = this.userService.handleCreateUser(createUser);
+        // return new ResponseEntity<User>("bạn đã tao thanh
+        // cong",responseHeader,HttpStatus.CREATED);
+        // này mã phản hồi nha bạn
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @DeleteMapping("/users/{id}")
 
-    public String deleteUser(@PathVariable("id") Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
 
         this.userService.handleDeleteUser(id);
-        return "delete thanh cong";
+
+        // XÓA LÀ OCEE NHA BAN
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
     @GetMapping("/users")
-    public List<User> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = this.userService.handleGetAllUsers();
-        return users;
+        return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     @GetMapping("/users/{id}")
-    public Optional<User> frecUserById(@PathVariable("id") long id) {
+    public ResponseEntity<Optional<User>> frecUserById(@PathVariable("id") long id) {
         Optional<User> user = this.userService.handleGetAllIdUser(id);
 
-        return user;
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PutMapping("/users/{id}")
-    public Optional<User> handleUpdateUser(@RequestBody User reqUser, @PathVariable("id") Long id) {
+    public ResponseEntity<Optional<User>> handleUpdateUser(@RequestBody User reqUser, @PathVariable("id") Long id) {
         Optional<User> optionalUser = this.userService.handleUpdateUser(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -65,7 +72,8 @@ public class UserController {
 
         }
         User updatedUser = this.userService.handleCreateUser(reqUser);
-        return Optional.of(updatedUser);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Optional.of(updatedUser));
     }
 
 }
