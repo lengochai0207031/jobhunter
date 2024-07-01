@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.service;
+package vn.hoidanit.jobhunter.util;
 
 import java.util.Collections;
 
@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import vn.hoidanit.jobhunter.service.UserService;
 
 @Component("UserDetailsService")
 // sài này ghi lại thằng implements UserDetailsService bạn cần chú ý nha bạn
