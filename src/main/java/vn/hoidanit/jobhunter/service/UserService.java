@@ -39,4 +39,9 @@ public class UserService {
     public Optional<User> handleUpdateUser(Long id) {
         return this.userRepository.findById(id);
     }
+
+    public User handleGetUserByUsername(String username) {
+        return this.userRepository.findByEmail(username);
+    }
+
 }
