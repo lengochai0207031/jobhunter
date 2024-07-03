@@ -31,6 +31,9 @@ public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
 
         RestResPonse<Object> res = new RestResPonse<Object>();
         res.setStatusCode(status);
+        if (body instanceof String) {
+            return body;
+        }
         // TODO Auto-generated method stub
         if (status >= 400) {
             return body;

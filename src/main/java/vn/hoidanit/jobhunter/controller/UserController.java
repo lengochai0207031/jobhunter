@@ -30,6 +30,7 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<User> createNewUser(@RequestBody User createUser) {
+        // này gán cứng nha bạn
         // User user = new User();
         // user.setName("lengochai");
         // user.setEmail("lengochai@gmail.com");
