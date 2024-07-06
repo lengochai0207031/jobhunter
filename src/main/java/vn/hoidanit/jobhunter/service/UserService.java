@@ -3,8 +3,13 @@ package vn.hoidanit.jobhunter.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Meta;
+import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
@@ -26,8 +31,19 @@ public class UserService {
         this.userRepository.deleteById(id);
     }
 
-    public List<User> handleGetAllUsers() {
-        return this.userRepository.findAll();
+    public ResultPaginationDTO handleGetAllUsers(Specification<User> spec, Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(spec, pageable);
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        Meta mt = new Meta();
+        mt.setPage(pageUser.getNumber());
+        mt.setPageSize(pageUser.getSize());
+
+        mt.setPage(pageUser.getTotalPages());
+        mt.setTotal(pageUser.getTotalElements());
+
+        rs.setMeta(mt);
+        rs.setResult(pageUser.getContent());
+        return rs;
     }
 
     public Optional<User> handleGetAllIdUser(Long id) {

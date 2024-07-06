@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
 import vn.hoidanit.jobhunter.domain.RestResPonse;
+import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 
 @ControllerAdvice
 public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
@@ -22,6 +23,7 @@ public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body,
             MethodParameter returnType,
+
             MediaType selectedContentType,
             Class selectedConverterType,
             ServerHttpRequest request,
@@ -39,7 +41,8 @@ public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
             return body;
         } else {
             res.setData(body);
-            res.setMessage("CALL API SUCCESS");
+            ApiMessage message = returnType.getMethodAnnotation(ApiMessage.class);
+            res.setMessage(message != null ? message.value() : "CALL API SUCCESS");
         }
         return res;
     }
