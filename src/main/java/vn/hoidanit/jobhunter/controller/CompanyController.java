@@ -1,6 +1,5 @@
 package vn.hoidanit.jobhunter.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
@@ -8,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
+@RequestMapping("/api/v1")
 public class CompanyController {
     private final CompanyService companyService;
 
@@ -38,6 +40,7 @@ public class CompanyController {
     }
 
     @GetMapping("/companies")
+    @ApiMessage("facet all users")
     public ResponseEntity<ResultPaginationDTO> getAllCompany(
 
             @RequestParam("current") Optional<String> cureOptional,

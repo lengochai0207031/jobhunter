@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.Meta;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.DTO.Meta;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 
 @Service

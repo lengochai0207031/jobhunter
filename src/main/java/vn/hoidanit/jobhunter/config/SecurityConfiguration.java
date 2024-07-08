@@ -45,7 +45,7 @@ public class SecurityConfiguration {
                 .csrf(c -> c.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/login").permitAll() // Adjust this based on your
+                        .requestMatchers("/", "/api/v1/login").permitAll() // Adjust this based on your
                         // public paths
                         .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())

@@ -23,7 +23,6 @@ public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body,
             MethodParameter returnType,
-
             MediaType selectedContentType,
             Class selectedConverterType,
             ServerHttpRequest request,
