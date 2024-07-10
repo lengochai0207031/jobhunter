@@ -93,6 +93,8 @@ public class UserController {
         if (!optionalUser.isPresent()) {
             throw new IdInvalidException("User với id = " + user.getId() + " không tồn tại");
         }
+
+        // có optional nha bạn cần .get dể ms ko bị lỗi
         ResUpdateUserDTO resUpdateUserDTO = this.userService.convertToResUpdateUserDTO(optionalUser.get());
         return ResponseEntity.ok(resUpdateUserDTO);
     }
