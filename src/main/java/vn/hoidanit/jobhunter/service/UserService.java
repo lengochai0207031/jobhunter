@@ -39,8 +39,8 @@ public class UserService {
         Page<User> pageUser = this.userRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
         Meta mt = new Meta();
-        mt.setPage(pageUser.getNumber());
-        mt.setPageSize(pageUser.getSize());
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
 
         mt.setPage(pageUser.getTotalPages());
         mt.setTotal(pageUser.getTotalElements());
@@ -126,6 +126,19 @@ public class UserService {
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
         return res;
+    }
+
+    public void updatedUserToken(String token, String email) {
+
+        User currentUser = this.userRepository.findByEmail(email);
+        if (currentUser != null) {
+            currentUser.setRefreshToken(token);
+            this.userRepository.save(currentUser);
+        }
+    }
+
+    public User findByRefreshTokenAndEmail(String token, String email) {
+        return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
 
 }

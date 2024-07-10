@@ -71,16 +71,8 @@ public class UserController {
     @ApiMessage("facet all users")
     public ResponseEntity<ResultPaginationDTO> getAllUsers(
             @Filter Specification<User> spec, Pageable pageable) {
-        // @RequestParam("current") Optional<String> currentOptional,
-        // @RequestParam("pageSize") Optional<String> pageSizeOptional) {
-        // String sCurrent = currentOptional.isPresent() ? currentOptional.get() : "";
-        // String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() :
-        // "";
-        // int current = Integer.parseInt(sCurrent);
-        // int pageSize = Integer.parseInt(sPageSize);
-        // Pageable pageable = PageRequest.of(current - 1, pageSize);
-        ResultPaginationDTO users = this.userService.handleGetAllUsers(spec, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(users);
+
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleGetAllUsers(spec, pageable));
     }
 
     @GetMapping("/users/{id}")

@@ -2,20 +2,20 @@ package vn.hoidanit.jobhunter.controller;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
+import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,47 +34,49 @@ public class CompanyController {
     }
 
     @PostMapping("/companies")
+    @ApiMessage("Create a companies")
     public ResponseEntity<Company> postCreateCompany(@Valid @RequestBody Company company) {
+
         Company companyCreate = this.companyService.createCompany(company);
         return ResponseEntity.status(HttpStatus.CREATED).body(companyCreate);
     }
 
     @GetMapping("/companies")
-    @ApiMessage("facet all users")
+    @ApiMessage("Fetch all companies")
     public ResponseEntity<ResultPaginationDTO> getAllCompany(
+            @Filter Specification<Company> spec, Pageable pageable) {
 
-            @RequestParam("current") Optional<String> cureOptional,
-            @RequestParam("pareSize") Optional<String> pareOptional) {
-        String sCurrent = cureOptional.isPresent() ? cureOptional.get() : "";
-        String sPageSize = pareOptional.isPresent() ? pareOptional.get() : "";
-        int current = Integer.parseInt(sCurrent);
-        int pageSize = Integer.parseInt(sPageSize);
-        Pageable pageable = PageRequest.of(current - 1, pageSize);
-        ResultPaginationDTO companies = this.companyService.getAllCompany(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(companies);
-    }
-
-    @PutMapping("/companies/{id}")
-    public ResponseEntity<Optional<Company>> putMethodName(@RequestBody Company company, @PathVariable("id") Long id) {
-        Optional<Company> companies = this.companyService.postUpdateCompany(id);
-        if (companies.isPresent()) {
-
-            Company companyUpdate = companies.get();
-
-            companyUpdate.setName(company.getName());
-            companyUpdate.setAddress(company.getAddress());
-            companyUpdate.setDescription(company.getDescription());
-            companyUpdate.setLogo(company.getLogo());
-
-        }
-        Company updatecompany = this.companyService.createCompany(company);
-        return ResponseEntity.status(HttpStatus.OK).body(Optional.of(updatecompany));
+        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.getAllCompany(spec, pageable));
     }
 
     @DeleteMapping("/companies/{id}")
-    public ResponseEntity<String> deleteCompanies(@PathVariable("id") Long id) {
+    @ApiMessage("Delete a companies")
+    public ResponseEntity<Void> deleteCompanies(@PathVariable("id") Long id) throws IdInvalidException {
+        Optional<Company> cuCompany = this.companyService.findCompanyById(id);
+        if (!cuCompany.isPresent()) {
+            throw new IdInvalidException("Company with id " + id + " is not found");
+
+        }
         this.companyService.deleteCompany(id);
-        return ResponseEntity.status(HttpStatus.OK).body("OK");
+        return ResponseEntity.ok(null);
+    }
+
+    @PutMapping("/companies")
+    @ApiMessage("Update a company")
+    public ResponseEntity<Company> putCompanies(@RequestBody Company company) {
+        Optional<Company> updatedCompany;
+
+        try {
+            updatedCompany = companyService.handleUpdateCompany(company);
+
+            if (!updatedCompany.isPresent()) {
+                throw new IdInvalidException("Company with id " + company.getId() + " is not found");
+            }
+
+            return ResponseEntity.ok(updatedCompany.get());
+        } catch (IdInvalidException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
 }
