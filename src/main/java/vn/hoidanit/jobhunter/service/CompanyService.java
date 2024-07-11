@@ -1,5 +1,6 @@
 package vn.hoidanit.jobhunter.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -7,18 +8,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.DTO.Meta;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
+import vn.hoidanit.jobhunter.repository.UserRepository;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
 @Service
 public class CompanyService {
     private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
-    public CompanyService(CompanyRepository companyRepository) {
+    public CompanyService(CompanyRepository companyRepository, UserRepository userRepository) {
         this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
     }
 
     public Company createCompany(Company company) {
@@ -36,10 +42,6 @@ public class CompanyService {
         rs.setMeta(mt);
         rs.setResult(pageCompany.getContent());
         return rs;
-    }
-
-    public Optional<Company> findCompanyById(Long id) {
-        return companyRepository.findById(id);
     }
 
     public Company updateCompany(Company company) {
@@ -66,5 +68,23 @@ public class CompanyService {
 
     public void deleteCompany(Long id) {
         this.companyRepository.deleteById(id);
+
     }
+
+    public Optional<Company> findCompanyById(Long id) {
+        return companyRepository.findById(id);
+    }
+
+    public void handleDelete(Long id) {
+        Optional<Company> companyOptional = this.companyRepository.findById(id);
+        if (companyOptional.isPresent()) {
+            Company com = companyOptional.get();
+            List<User> companyUsers = this.userRepository.findByCompany(com);
+            this.userRepository.deleteAll(companyUsers);
+            this.companyRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Company with id " + id + " not found");
+        }
+    }
+
 }

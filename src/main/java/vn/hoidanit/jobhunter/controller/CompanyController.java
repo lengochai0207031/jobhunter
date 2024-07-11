@@ -43,22 +43,21 @@ public class CompanyController {
 
     @GetMapping("/companies")
     @ApiMessage("Fetch all companies")
-    public ResponseEntity<ResultPaginationDTO> getAllCompany(
+    public ResponseEntity<ResultPaginationDTO> getAllCompanies(
             @Filter Specification<Company> spec, Pageable pageable) {
 
         return ResponseEntity.status(HttpStatus.OK).body(this.companyService.getAllCompany(spec, pageable));
     }
 
     @DeleteMapping("/companies/{id}")
-    @ApiMessage("Delete a companies")
+    @ApiMessage("Delete a company")
     public ResponseEntity<Void> deleteCompanies(@PathVariable("id") Long id) throws IdInvalidException {
         Optional<Company> cuCompany = this.companyService.findCompanyById(id);
         if (!cuCompany.isPresent()) {
             throw new IdInvalidException("Company with id " + id + " is not found");
-
         }
         this.companyService.deleteCompany(id);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/companies")

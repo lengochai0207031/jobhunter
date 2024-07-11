@@ -69,6 +69,7 @@ public class User {
     // tao mối quan he
 
     @ManyToOne
+
     @JoinColumn(name = "company_id")
     private Company company;
 }

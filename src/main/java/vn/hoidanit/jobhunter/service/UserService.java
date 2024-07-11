@@ -9,65 +9,87 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.DTO.Meta;
 import vn.hoidanit.jobhunter.domain.DTO.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.DTO.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.DTO.ResUserDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, CompanyRepository companyRepository,
+            CompanyService companyService) {
         this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
+        this.companyService = companyService;
     }
 
     public User handleCreateUser(User user) {
 
-        User users = this.userRepository.save(user);
-        return users;
+        // check Company
+        if (user.getCompany() != null) {
+
+            Optional<Company> companyOptional = this.companyRepository.findById(user.getCompany().getId());
+            user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        }
+
+        return this.userRepository.save(user);
     }
 
     public void handleDeleteUser(Long id) {
         this.userRepository.deleteById(id);
     }
 
-    public ResultPaginationDTO handleGetAllUsers(Specification<User> spec, Pageable pageable) {
+    public ResultPaginationDTO fetchAllUser(Specification<User> spec, Pageable pageable) {
         Page<User> pageUser = this.userRepository.findAll(spec, pageable);
         ResultPaginationDTO rs = new ResultPaginationDTO();
         Meta mt = new Meta();
+
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
-
-        mt.setPage(pageUser.getTotalPages());
+        mt.setPages(pageUser.getTotalPages());
         mt.setTotal(pageUser.getTotalElements());
 
         rs.setMeta(mt);
-        rs.setResult(pageUser.getContent());
-        // remove sensitive data
+
         List<ResUserDTO> listUser = pageUser.getContent()
-                .stream().map(item -> new ResUserDTO(
-                        item.getId(),
-                        item.getEmail(),
-                        item.getName(),
-                        item.getGender(),
-                        item.getAddress(),
-                        item.getAge(),
-                        item.getUpdatedAt(),
-                        item.getCreatedAt()))
-                .collect(Collectors.toList());
+                .stream().map(item -> {
+                    ResUserDTO.CompanyUser companyUser = item.getCompany() != null
+                            ? new ResUserDTO.CompanyUser(item.getCompany().getId(), item.getCompany().getName())
+                            : null;
+
+                    return new ResUserDTO(
+                            item.getId(),
+                            item.getEmail(),
+                            item.getName(),
+                            item.getGender(),
+                            item.getAddress(),
+                            item.getAge(),
+                            item.getUpdatedAt(),
+                            item.getCreatedAt(),
+                            companyUser);
+                }).collect(Collectors.toList());
 
         rs.setResult(listUser);
         return rs;
     }
 
-    public Optional<User> handleGetAllIdUser(Long id) {
+    public Optional<User> fetchUserById(Long id) {
 
         Optional<User> user = this.userRepository.findById(id);
-        return user;
+        if (user.isPresent()) {
+            return Optional.of(user.get());
+
+        }
+        return null;
     }
 
     public Optional<User> handleUpdateUser(User user) {
@@ -78,6 +100,12 @@ public class UserService {
             users.setGender(user.getGender());
             users.setAge(user.getAge());
             users.setName(user.getName());
+
+            if (user.getCompany() != null) {
+                Optional<Company> company = this.companyService.findCompanyById(user.getCompany().getId());
+                users.setCompany(company.isPresent() ? company.get() : null);
+
+            }
             this.userRepository.save(users); // Save the updated user
             return Optional.of(users); // Return the updated user
         }
@@ -94,6 +122,8 @@ public class UserService {
 
     public ResCreateUserDTO convertToResCreateUserDTO(User user) {
         ResCreateUserDTO res = new ResCreateUserDTO();
+        ResCreateUserDTO.CompanyUser com = new ResCreateUserDTO.CompanyUser();
+
         res.setId(user.getId());
         res.setName(user.getName());
         res.setEmail(user.getEmail());
@@ -101,11 +131,25 @@ public class UserService {
         res.setCreatedAt(user.getCreatedAt());
         res.setAddress(user.getAddress());
         res.setGender(user.getGender());
+
+        if (user.getCompany() != null) {
+            com.setId(user.getCompany().getId());
+            com.setName(user.getCompany().getName());
+            res.setCompany(com);
+        }
+
         return res;
     }
 
     public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
         ResUpdateUserDTO res = new ResUpdateUserDTO();
+        ResUpdateUserDTO.CompanyUser com = new ResUpdateUserDTO.CompanyUser();
+        if (user.getCompany() != null) {
+            com.setId(user.getCompany().getId());
+            com.setName(user.getCompany().getName());
+            res.setCompany(com);
+
+        }
         res.setId(user.getId());
         res.setName(user.getName());
         res.setAge(user.getAge());
@@ -117,6 +161,13 @@ public class UserService {
 
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
+        ResUserDTO.CompanyUser com = new ResUserDTO.CompanyUser();
+        if (user.getCompany() != null) {
+            com.setId(user.getCompany().getId());
+            com.setName(user.getCompany().getName());
+            res.setCompany(com);
+
+        }
         res.setId(user.getId());
         res.setEmail(user.getEmail());
         res.setName(user.getName());

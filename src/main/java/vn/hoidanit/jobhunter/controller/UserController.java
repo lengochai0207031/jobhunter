@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
+
+import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
+import vn.hoidanit.jobhunter.domain.DTO.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.DTO.ResUpdateUserDTO;
+import vn.hoidanit.jobhunter.domain.DTO.ResUserDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
@@ -35,8 +39,8 @@ public class UserController {
 
     @PostMapping("/users")
     @ApiMessage("create a new users")
-    public ResponseEntity<User> createNewUser(
-            @RequestBody User createUser) throws IdInvalidException {
+    public ResponseEntity<ResCreateUserDTO> createNewUser(@Valid @RequestBody User createUser)
+            throws IdInvalidException {
 
         String hashPassWord = this.passwordEncoder.encode(createUser.getPassword());
         createUser.setPassword(hashPassWord);
@@ -46,13 +50,13 @@ public class UserController {
                     "Email already exists" + createUser.getEmail() + "đã tồn tại, vui lòng xử dung email khác");
         }
         User newUser = this.userService.handleCreateUser(createUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToResCreateUserDTO(newUser));
     }
 
     @DeleteMapping("/users/{id}")
     @ApiMessage("Delete a user")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) throws IdInvalidException {
-        Optional<User> currentUser = this.userService.handleGetAllIdUser(id);
+        Optional<User> currentUser = this.userService.fetchUserById(id);
         if (!currentUser.isPresent()) {
             throw new IdInvalidException("User voi id" + id + " is null");
 
@@ -69,21 +73,23 @@ public class UserController {
 
     @GetMapping("/users")
     @ApiMessage("facet all users")
-    public ResponseEntity<ResultPaginationDTO> getAllUsers(
+    public ResponseEntity<ResultPaginationDTO> getAllUser(
             @Filter Specification<User> spec, Pageable pageable) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.userService.handleGetAllUsers(spec, pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.fetchAllUser(spec,
+                pageable));
     }
 
     @GetMapping("/users/{id}")
     @ApiMessage("facet all users by id")
-    public ResponseEntity<Optional<User>> frecUserById(@PathVariable("id") long id) throws IdInvalidException {
-        Optional<User> currentUser = this.userService.handleGetAllIdUser(id);
+    public ResponseEntity<ResUserDTO> getAllUserById(@PathVariable("id") long id) throws IdInvalidException {
+        Optional<User> fetchUsers = this.userService.fetchUserById(id);
 
-        if (!currentUser.isPresent()) {
-            throw new IdInvalidException("User với id = " + id + " không tồn tại");
+        if (fetchUsers == null) {
+            throw new IdInvalidException("User với id = " + id + " No tồn tại");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(currentUser);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.userService.convertToResUserDTO(fetchUsers.get()));
     }
 
     @PutMapping("/users")
