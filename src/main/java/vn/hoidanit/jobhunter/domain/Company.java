@@ -66,5 +66,5 @@ public class Company {
     private Set<User> users;
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
     @JsonIgnore
-    List<Job> jobs;
+    private List<Job> jobs;
 }
