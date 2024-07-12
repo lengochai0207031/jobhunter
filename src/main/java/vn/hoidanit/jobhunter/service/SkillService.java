@@ -1,6 +1,5 @@
 package vn.hoidanit.jobhunter.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.Skill;
-import vn.hoidanit.jobhunter.domain.DTO.Meta;
+import vn.hoidanit.jobhunter.domain.requests.Meta;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
 @Service

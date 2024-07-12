@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.DTO.Meta;
-import vn.hoidanit.jobhunter.domain.DTO.ResCreateUserDTO;
-import vn.hoidanit.jobhunter.domain.DTO.ResUpdateUserDTO;
-import vn.hoidanit.jobhunter.domain.DTO.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.requests.Meta;
+import vn.hoidanit.jobhunter.domain.requests.ResCreateUserDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResUpdateUserDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResUserDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 

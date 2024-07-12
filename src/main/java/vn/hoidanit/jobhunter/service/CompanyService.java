@@ -12,7 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.DTO.Meta;
+import vn.hoidanit.jobhunter.domain.requests.Meta;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;

@@ -2,7 +2,7 @@ package vn.hoidanit.jobhunter.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import vn.hoidanit.jobhunter.domain.DTO.Meta;
+import vn.hoidanit.jobhunter.domain.requests.Meta;
 
 @Getter
 @Setter

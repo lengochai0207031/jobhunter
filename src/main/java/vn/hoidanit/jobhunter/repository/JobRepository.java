@@ -19,5 +19,5 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 
     void deleteById(long id);
 
-    Skill findByName(String name);
+  
 }
