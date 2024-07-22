@@ -10,12 +10,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.requests.Meta;
 import vn.hoidanit.jobhunter.domain.requests.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.requests.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.requests.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 
@@ -24,21 +25,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final CompanyService companyService;
+    private final RoleService roleService;
 
     public UserService(UserRepository userRepository, CompanyRepository companyRepository,
-            CompanyService companyService) {
+            CompanyService companyService, RoleService roleService) {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     public User handleCreateUser(User user) {
-
-        // check Company
+        // Check Company
         if (user.getCompany() != null) {
-
             Optional<Company> companyOptional = this.companyRepository.findById(user.getCompany().getId());
-            user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+            user.setCompany(companyOptional.orElse(null));
+        }
+
+        // Check Role
+        if (user.getRole() != null) {
+            Optional<Role> roleOptional = Optional.ofNullable(this.roleService.fetchById(user.getRole().getId()));
+            user.setRole(roleOptional.orElse(null));
         }
 
         return this.userRepository.save(user);
@@ -60,36 +67,16 @@ public class UserService {
 
         rs.setMeta(mt);
 
-        List<ResUserDTO> listUser = pageUser.getContent()
-                .stream().map(item -> {
-                    ResUserDTO.CompanyUser companyUser = item.getCompany() != null
-                            ? new ResUserDTO.CompanyUser(item.getCompany().getId(), item.getCompany().getName())
-                            : null;
-
-                    return new ResUserDTO(
-                            item.getId(),
-                            item.getEmail(),
-                            item.getName(),
-                            item.getGender(),
-                            item.getAddress(),
-                            item.getAge(),
-                            item.getUpdatedAt(),
-                            item.getCreatedAt(),
-                            companyUser);
-                }).collect(Collectors.toList());
+        List<ResUserDTO> listUser = pageUser.getContent().stream()
+                .map(this::convertToResUserDTO)
+                .collect(Collectors.toList());
 
         rs.setResult(listUser);
         return rs;
     }
 
     public Optional<User> fetchUserById(Long id) {
-
-        Optional<User> user = this.userRepository.findById(id);
-        if (user.isPresent()) {
-            return Optional.of(user.get());
-
-        }
-        return null;
+        return this.userRepository.findById(id);
     }
 
     public Optional<User> handleUpdateUser(User user) {
@@ -101,15 +88,22 @@ public class UserService {
             users.setAge(user.getAge());
             users.setName(user.getName());
 
+            // Check Company
             if (user.getCompany() != null) {
                 Optional<Company> company = this.companyService.findCompanyById(user.getCompany().getId());
-                users.setCompany(company.isPresent() ? company.get() : null);
-
+                users.setCompany(company.orElse(null));
             }
-            this.userRepository.save(users); // Save the updated user
-            return Optional.of(users); // Return the updated user
+
+            // Check Role
+            if (user.getRole() != null) {
+                Optional<Role> role = Optional.ofNullable(this.roleService.fetchById(user.getRole().getId()));
+                users.setRole(role.orElse(null));
+            }
+
+            this.userRepository.save(users);
+            return Optional.of(users);
         }
-        return Optional.empty(); // Return an empty Optional if the user is not found
+        return Optional.empty();
     }
 
     public User handleGetUserByUsername(String username) {
@@ -144,30 +138,40 @@ public class UserService {
     public ResUpdateUserDTO convertToResUpdateUserDTO(User user) {
         ResUpdateUserDTO res = new ResUpdateUserDTO();
         ResUpdateUserDTO.CompanyUser com = new ResUpdateUserDTO.CompanyUser();
+
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
             com.setName(user.getCompany().getName());
             res.setCompany(com);
-
         }
+
         res.setId(user.getId());
         res.setName(user.getName());
         res.setAge(user.getAge());
         res.setUpdatedAt(user.getUpdatedAt());
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
+
         return res;
     }
 
     public ResUserDTO convertToResUserDTO(User user) {
         ResUserDTO res = new ResUserDTO();
         ResUserDTO.CompanyUser com = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
+
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
             com.setName(user.getCompany().getName());
             res.setCompany(com);
-
         }
+
+        if (user.getRole() != null) {
+            roleUser.setId(user.getRole().getId());
+            roleUser.setName(user.getRole().getName());
+            res.setRole(roleUser);
+        }
+
         res.setId(user.getId());
         res.setEmail(user.getEmail());
         res.setName(user.getName());
@@ -176,11 +180,11 @@ public class UserService {
         res.setCreatedAt(user.getCreatedAt());
         res.setGender(user.getGender());
         res.setAddress(user.getAddress());
+
         return res;
     }
 
     public void updatedUserToken(String token, String email) {
-
         User currentUser = this.userRepository.findByEmail(email);
         if (currentUser != null) {
             currentUser.setRefreshToken(token);
@@ -188,8 +192,7 @@ public class UserService {
         }
     }
 
-    public User findByRefreshTokenAndEmail(String token, String email) {
+    public User getUserByRefreshTokenAndEmail(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
-
 }

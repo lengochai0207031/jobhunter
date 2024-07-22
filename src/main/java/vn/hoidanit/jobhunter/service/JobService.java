@@ -9,12 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.requests.Meta;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.requests.Job.ResCreateJobDTO;
 import vn.hoidanit.jobhunter.domain.requests.Job.ResUpdateJobDTO;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
@@ -22,16 +24,17 @@ import vn.hoidanit.jobhunter.repository.SkillRepository;
 public class JobService {
     private final JobRepository jobRepository;
     private final SkillRepository skillRepository;
+    private final CompanyRepository companyRepository;
 
-    public JobService(JobRepository jobRepository, SkillRepository skillRepository) {
+    public JobService(JobRepository jobRepository, SkillRepository skillRepository,
+            CompanyRepository companyRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
+        this.companyRepository = companyRepository;
     }
 
     public Optional<Job> fetchJobById(long id) {
-
-        Job fetchJob = this.jobRepository.findById(id);
-        return Optional.of(fetchJob);
+        return this.jobRepository.findById(id);
     }
 
     public ResCreateJobDTO create(Job j) {
@@ -43,6 +46,15 @@ public class JobService {
 
             List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
             j.setSkills(dbSkills);
+        }
+
+        // check company
+        if (j.getCompany() != null) {
+            Optional<Company> companyOptional = this.companyRepository.findById(j.getCompany().getId());
+            if (companyOptional.isPresent()) {
+                j.setCompany(companyOptional.get());
+
+            }
         }
 
         // create job
@@ -72,7 +84,7 @@ public class JobService {
         return dto;
     }
 
-    public ResUpdateJobDTO update(Job j) {
+    public ResUpdateJobDTO update(Job j, Job jobDB) {
         // check skills
         if (j.getSkills() != null) {
             List<Long> reqSkills = j.getSkills()
@@ -80,11 +92,21 @@ public class JobService {
                     .collect(Collectors.toList());
 
             List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
+            jobDB.setSkills(dbSkills);
             j.setSkills(dbSkills);
         }
-
+        jobDB.setName(j.getName());
+        jobDB.setSalary(j.getSalary());
+        jobDB.setQuantity(j.getQuantity());
+        jobDB.setLocation(j.getLocation());
+        jobDB.setLevel(j.getLevel());
+        jobDB.setStartDate(j.getStartDate());
+        jobDB.setEndDate(j.getEndDate());
+        jobDB.setActive(j.isActive());
+        jobDB.setUpdatedAt(j.getUpdatedAt());
+        jobDB.setUpdatedBy(j.getUpdatedBy());
         // update job
-        Job currentJob = this.jobRepository.save(j);
+        Job currentJob = this.jobRepository.save(jobDB);
 
         // convert response
         ResUpdateJobDTO dto = new ResUpdateJobDTO();
@@ -99,6 +121,16 @@ public class JobService {
         dto.setActive(currentJob.isActive());
         dto.setUpdatedAt(currentJob.getUpdatedAt());
         dto.setUpdatedBy(currentJob.getUpdatedBy());
+
+        if (j.getCompany() != null) {
+            Optional<Company> cOptional = this.companyRepository.findById(j.getCompany().getId());
+            if (cOptional.isPresent()) {
+                jobDB.setCompany(cOptional.get());
+                j.setCompany(cOptional.get());
+
+            }
+
+        }
 
         if (currentJob.getSkills() != null) {
             List<String> skills = currentJob.getSkills()

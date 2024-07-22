@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import jakarta.servlet.http.HttpServletResponse;
-import vn.hoidanit.jobhunter.domain.RestResPonse;
+import vn.hoidanit.jobhunter.domain.requests.RestResPonse;
 import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 
 @ControllerAdvice
-public class FormatRestResponsey implements ResponseBodyAdvice<Object> {
+public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {

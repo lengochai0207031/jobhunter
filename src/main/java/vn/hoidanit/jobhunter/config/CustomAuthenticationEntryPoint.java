@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import vn.hoidanit.jobhunter.domain.RestResPonse;
+import vn.hoidanit.jobhunter.domain.requests.RestResPonse;
 
 import java.io.IOException;
 import java.util.Optional;

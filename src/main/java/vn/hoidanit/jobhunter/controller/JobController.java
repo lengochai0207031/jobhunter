@@ -19,7 +19,7 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.requests.Job.ResCreateJobDTO;
 import vn.hoidanit.jobhunter.domain.requests.Job.ResUpdateJobDTO;
 import vn.hoidanit.jobhunter.service.JobService;
@@ -52,7 +52,7 @@ public class JobController {
         }
 
         return ResponseEntity.ok()
-                .body(this.jobService.update(job));
+                .body(this.jobService.update(job, currentJob.get()));
     }
 
     @DeleteMapping("/jobs/{id}")

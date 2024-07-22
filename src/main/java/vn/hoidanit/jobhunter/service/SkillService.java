@@ -8,9 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 import org.springframework.stereotype.Service;
 
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.Skill;
 import vn.hoidanit.jobhunter.domain.requests.Meta;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
 
 @Service

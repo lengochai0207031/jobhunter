@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.requests.ResCreateUserDTO;
 import vn.hoidanit.jobhunter.domain.requests.ResUpdateUserDTO;
 import vn.hoidanit.jobhunter.domain.requests.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;

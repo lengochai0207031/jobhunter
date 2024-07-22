@@ -1,6 +1,7 @@
 package vn.hoidanit.jobhunter.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,9 +16,8 @@ public interface JobRepository extends JpaRepository<Job, Long>, JpaSpecificatio
 
     Job save(Job job);
 
-    Job findById(long id);
+    Optional<Job> findById(long id);
 
     void deleteById(long id);
 
-  
 }

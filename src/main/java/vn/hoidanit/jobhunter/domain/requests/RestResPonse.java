@@ -1,4 +1,4 @@
-package vn.hoidanit.jobhunter.domain;
+package vn.hoidanit.jobhunter.domain.requests;
 
 public class RestResPonse<T> {
     private int statusCode;

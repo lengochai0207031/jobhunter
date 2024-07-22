@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Company;
-import vn.hoidanit.jobhunter.domain.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.requests.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.util.annotion.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
@@ -46,7 +46,7 @@ public class CompanyController {
     public ResponseEntity<ResultPaginationDTO> getAllCompanies(
             @Filter Specification<Company> spec, Pageable pageable) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.companyService.getAllCompany(spec, pageable));
+        return ResponseEntity.ok(this.companyService.handleGetCompany(spec, pageable));
     }
 
     @DeleteMapping("/companies/{id}")
@@ -76,6 +76,17 @@ public class CompanyController {
         } catch (IdInvalidException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @GetMapping("/companies/{id}")
+    @ApiMessage(" fetch company by id")
+    public ResponseEntity<Company> fetchCompanyById(@PathVariable("id") Long id) throws IdInvalidException {
+        Optional<Company> cOptional = companyService.findCompanyById(id);
+        if (cOptional == null) {
+            throw new IdInvalidException("Company với id = " + id + " No tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(cOptional.get());
+
     }
 
 }

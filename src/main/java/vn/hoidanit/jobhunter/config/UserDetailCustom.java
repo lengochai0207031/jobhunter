@@ -9,8 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import vn.hoidanit.jobhunter.service.UserService;
 
-@Component("UserDetailsService")
-// sài này ghi lại thằng implements UserDetailsService bạn cần chú ý nha bạn
+@Component("userDetailsService")
 public class UserDetailCustom implements UserDetailsService {
     private final UserService userService;
 
@@ -26,10 +25,8 @@ public class UserDetailCustom implements UserDetailsService {
         }
 
         return new User(
-
-                user.getName(),
+                user.getEmail(), // Ensure this matches the username field in your User domain class
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-
     }
 }
